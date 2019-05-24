@@ -1,5 +1,5 @@
-#hanoi boys
-
+# Luiz Fabião Giserman
+# Universidade Federal do Rio de Janeiro
 
 def tower (disk, source, intermediate, destination):
         global x
