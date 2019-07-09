@@ -590,6 +590,9 @@ MonoBehaviour:
   height: 0.3
   scaling: 0.6
   pinPosition: 12
+  timer: 0
+  notRan: 1
+  cameraa: {fileID: 0}
 --- !u!1 &1638234638
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Threading.Tasks;
+using System;
 
 public class createDisks : MonoBehaviour
 {
@@ -14,14 +16,18 @@ public class createDisks : MonoBehaviour
     static public Stack intermediate;
     static public Stack destination;
     public int pinPosition = 12;
+    public float timer = 0f;
+    public bool notRan = true;
+    public Camera cameraa ;
     // Start is called before the first frame update
     void Start()
     {
       SpawnDisks();
-      StartCoroutine(init());
+      RunTowerTask(numberDisks, source, intermediate, destination);
+      /*StartCoroutine(init());*/
     }
 
-    void SpawnDisks ()
+    async void SpawnDisks ()
     {
       source = new Stack();
       intermediate = new Stack();
@@ -38,10 +44,13 @@ public class createDisks : MonoBehaviour
       source.Push(0);
       intermediate.Push(1);
       destination.Push(2);
+
+      await Task.Yield();
+      await Task.Delay(1000);
       /*tower(numberDisks, source, intermediate, destination);*/
     }
 
-    void moveDisk(Stack orig, Stack dest)
+    async Task moveDisk(Stack orig, Stack dest)
     {
          int idOrig = (int)orig.Pop();
          int idDest = (int)dest.Pop();
@@ -66,43 +75,49 @@ public class createDisks : MonoBehaviour
          dest.Push(idDest);
          orig.Push(idOrig);
 
-
-        /*public int amount = dest.Count();
-        GameObject aux = dest.Pop();
-        aux.transform.position = new Vector3(posX, yPos+(height*(amount)), 0); */
-      /*3 pins: 0 1 2
-        now that we know how many there are in each pile
-        simply multiply that value by height to know how high to put a disk
-
-      */
+         await Task.Yield();
+         await Task.Delay(1000);
+         return;
     }
 
-    IEnumerator tower (int numberDisks, Stack source, Stack intermediate, Stack destination)
+
+
+    async Task tower (int numberDisks, Stack source, Stack intermediate, Stack destination)
     {
         if (numberDisks == 1)
         {
-          moveDisk (source, destination);
-          yield return new WaitForSecondsRealtime(1);
+          await moveDisk (source, destination);
+          return;
         }
 
         else
         {
-            StartCoroutine(tower (numberDisks - 1, source, destination, intermediate));
-            moveDisk(source, destination);
-            StartCoroutine(tower (numberDisks - 1, intermediate, source, destination));
+            await tower (numberDisks - 1, source, destination, intermediate);
+            await moveDisk(source, destination);
+            await tower (numberDisks - 1, intermediate, source, destination);
         }
 
-        yield return new WaitForSeconds(1);
-        print ("here");
+        return;
     }
 
-    IEnumerator init ()
-    {
-      yield return new WaitForSeconds(2);
-      StartCoroutine(tower(numberDisks, source, intermediate, destination));
-    }
     // Update is called once per frame
     void Update()
     {
+
+
     }
+
+
+    async void RunTowerTask(int numberDisks, Stack source, Stack intermediate, Stack destination)
+    {
+      try
+      {
+          await tower(numberDisks, source, intermediate, destination);
+      }
+      catch(Exception e)
+      {
+          Debug.LogException(e);
+      }
+    }
+
 }
